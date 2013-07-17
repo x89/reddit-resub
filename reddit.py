@@ -13,27 +13,28 @@ class Resub:
     file = None
     debug = False
     default_subreddits = (
-        'AdviceAnimals',
         'AskReddit',
         'IAmA',
-        'WTF',
-        'announcements',
-        'atheism',
+        'adviceanimals',
         'aww',
         'bestof',
-        'blog',
+        'books',
+        'earthporn',
+        'explainlikeimfive',
         'funny',
         'gaming',
+        'gifs',
         'movies',
         'music',
         'news',
         'pics',
-        'politics',
         'science',
         'technology',
+        'television',
         'todayilearned',
         'videos',
-        'worldnews'
+        'worldnews',
+        'wtf',
     )
 
     def __init__(self):
@@ -81,7 +82,7 @@ class Resub:
         my_subs = set()
         for sub in self.r.get_my_subreddits():
             my_subs.add(sub.__unicode__())
-        return list(set(my_subs))
+        return list(my_subs)
 
 if __name__ == "__main__":
     Resub()
