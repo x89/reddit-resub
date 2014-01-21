@@ -1,5 +1,7 @@
 #!/usr/bin/env python2
 import praw, argparse, json
+from urllib2 import HTTPError
+from time import sleep
 
 parser = argparse.ArgumentParser(description='Resubscribe to your old subreddits.')
 parser.add_argument('--import', '-i', action="store_true")
@@ -35,6 +37,7 @@ class Resub:
         'videos',
         'worldnews',
         'wtf',
+        'sports',
     )
 
     def __init__(self):
@@ -62,12 +65,26 @@ class Resub:
 
     def import_subs(self):
         new_subs = []
+        my_subs = self.get_subs()
         with open(self.file, 'r') as fh:
             new_subs = json.load(fh)
         for sub in self.default_subreddits:
-            self.r.unsubscribe(sub)
+            try:
+                self.r.unsubscribe(sub)
+            except HTTPError:
+                sleep(10)
+                self.r.unsubscribe(sub)
+            print "Unsubscribed from {sub}".format(sub=sub)
+            sleep(2) # Reddit limit
         for sub in new_subs:
-            self.r.subscribe(sub)
+            if sub not in my_subs:
+                try:
+                    self.r.subscribe(sub)
+                except HTTPError:
+                    sleep(10)
+                    self.r.subscribe(sub)
+                print "Subscribed to {sub}".format(sub=sub)
+            sleep(2) # Reddit limit
         return True
 
     def get_user(self):
