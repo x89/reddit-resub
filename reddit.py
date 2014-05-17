@@ -87,12 +87,10 @@ class Resub:
         Unsubscribes from all default subreddits.
         '''
         print("Unsubscribing from all default subreddits")
-        my_subs = self.get_subs()
         for sub in self._default_subreddits:
-            if sub in my_subs:
-                self._r.unsubscribe(sub)
-                print("Unsubscribed from default subreddit {sub}".format(sub=sub))
-                sleep(self._reddit_sleep)
+            self._r.unsubscribe(sub)
+            print("Unsubscribed from default subreddit {sub}".format(sub=sub))
+            sleep(self._reddit_sleep)
 
     def import_subs(self):
         '''
