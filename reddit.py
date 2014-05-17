@@ -1,20 +1,20 @@
-#!/usr/bin/env python2
-import praw, argparse, json
-from urllib2 import HTTPError
+#!/usr/bin/env python3
+
+import praw
+import argparse
+import json
 from time import sleep
 
 parser = argparse.ArgumentParser(description='Resubscribe to your old subreddits.')
-parser.add_argument('--import', '-i', action="store_true")
-parser.add_argument('--user', '-u', help="Reddit username to import from/to.")
-parser.add_argument('--file', '-f', help="Provide a filename to export to / import from.")
-parser.add_argument('--debug', '-d', action="store_true")
+parser.add_argument('--import', '-i', action="store_true", help="Specify -i to import to the user\
+        Default is to save from a user (safe).")
+parser.add_argument('--user', '-u', help="Reddit username.")
+parser.add_argument('--file', '-f', help="Provide a filename to use.")
 
 class Resub:
-    r = praw.Reddit('reddit-resub')
-    user = None
-    file = None
-    debug = False
-    default_subreddits = (
+    _r = praw.Reddit('reddit-resub')
+    _reddit_sleep = 2 #  Seconds to sleep for, Reddit requests you don't do more than 2 per second.
+    _default_subreddits = (
         'announcements',
         'art',
         'askreddit',
@@ -32,14 +32,6 @@ class Resub:
         'food',
         'funny',
         'futurology',
-        'futurology',
-        'futurology',
-        'futurology',
-        'futurology',
-        'futurology',
-        'futurology',
-        'futurology',
-        'futurology',  # Just making sure.
         'gadgets',
         'gaming',
         'getmotivated',
@@ -73,70 +65,88 @@ class Resub:
         'videos',
         'worldnews',
         'writingprompts',
-        'Futurology',
-        'Futurology',
     )
 
-    def __init__(self):
-        args = parser.parse_args()
-        self.debug = args.debug
-        self.user = args.user
-        self.r.login(self.user)
+    def __init__(self, subscribe, user=None, filename=None):
+        self._r.login(user)
+        self._user = self.get_user()
 
-        if args.file:
-            self.file = args.file
-        else:
-            self.file = '{0}.subs'.format(self.get_user())
+        if not filename:
+            filename = '{user}.subs'.format(user=self._user)
+        self._filename = filename
 
-        if self.debug:
-            print "Using file: {0}".format(self.file)
-
-        if args.__dict__['import']:
-            if self.debug:
-                print "Importing subreddits to user {0}...".format(self.get_user())
+        if subscribe:
+            print("Subscribing to subreddits in '{file}'".format(file=filename, user=self.get_user()))
             self.import_subs()
         else:
-            if self.debug:
-                print "Exporting {0}'s subreddits...".format(self.get_user())
+            print("Exporting {user}'s subreddits to {file}".format(file=filename, user=self.get_user()))
             self.export_subs()
 
-    def import_subs(self):
-        new_subs = []
+    def unsub_defaults(self):
+        '''
+        Unsubscribes from all default subreddits.
+        '''
+        print("Unsubscribing from all default subreddits")
         my_subs = self.get_subs()
-        with open(self.file, 'r') as fh:
-            new_subs = json.load(fh)
-        for sub in self.default_subreddits:
-            try:
-                self.r.unsubscribe(sub)
-            except HTTPError:
-                sleep(10)
-                self.r.unsubscribe(sub)
-            print "Unsubscribed from {sub}".format(sub=sub)
-            sleep(2) # Reddit limit
+        for sub in self._default_subreddits:
+            if sub in my_subs:
+                self._r.unsubscribe(sub)
+                print("Unsubscribed from default subreddit {sub}".format(sub=sub))
+                sleep(self._reddit_sleep)
+
+    def import_subs(self):
+        '''
+        Uses subreddits defined in JSON format in a file to import to a Reddit
+        user account. Unsubscribes from default subreddits first.
+        '''
+        fh = open(self._filename, 'r')
+        new_subs = json.load(fh)
+        fh.close()
+        self.unsub_defaults()
+        my_subs = list(
+            set(self.get_subs()) - (set(self._default_subreddits) | set(new_subs))
+        )
+        for sub in my_subs:
+            self._r.unsubscribe(sub)
+            print("Unsubscribed from subreddit {sub}".format(sub=sub))
+            sleep(self._reddit_sleep)
         for sub in new_subs:
             if sub not in my_subs:
-                try:
-                    self.r.subscribe(sub)
-                except HTTPError:
-                    sleep(10)
-                    self.r.subscribe(sub)
-                print "Subscribed to {sub}".format(sub=sub)
-            sleep(2) # Reddit limit
-        return True
+                self._r.subscribe(sub)
+                print("Subscribed to {sub}".format(sub=sub))
+                sleep(self._reddit_sleep)
 
     def get_user(self):
-        return self.r.user.__unicode__()
+        '''
+        Specifically returns the username from the Reddit object, not the one
+        specified by the user / script. This is guaranteed to be correct in 
+        other words.
+        '''
+        return str(self._r.user)
 
     def export_subs(self):
-        subs = json.dumps(self.get_subs())
-        with open(self.file, 'w') as fh:
-            fh.write(subs)
+        '''
+        Saves the user's subreddits to file.
+        '''
+        fh = open(self._filename, 'w')
+        json.dump(self.get_subs(), fh)
+        fh.close()
 
     def get_subs(self):
+        '''
+        Returns a unique list of subreddits to which the user is subscribed.
+        '''
         my_subs = set()
-        for sub in self.r.get_my_subreddits():
-            my_subs.add(sub.__unicode__())
+        for sub in self._r.get_my_subreddits(limit=None):
+            my_subs.add(str(sub))
         return list(my_subs)
 
+
 if __name__ == "__main__":
-    Resub()
+    args = parser.parse_args()
+
+    # Boolean, True if --import / -i
+    # If true then subscribe, if false then export to file.
+    subscribe = getattr(args, 'import')
+
+    r = Resub(subscribe, filename=getattr(args, 'file'), user=getattr(args, 'user'))
