@@ -23,14 +23,14 @@ Example Usage
 ============
 * Save user x89's subreddits to file abc.subs
 
-    python reddit.py --user x89 --file abc.subs
+    python reddit.py --user x89 --file abc.subs    
 
 * Import the subreddits listed in abc.subs to user x78
 
-    python reddit.py --import --user x78 --file abc.subs
+    python reddit.py --import --user x78 --file abc.subs    
 
 * Set up environment
 
-    virtualenv .
-    source bin/activate
-    pip install -r requirements.txt
+    virtualenv .    
+    source bin/activate    
+    pip install -r requirements.txt    
