@@ -31,9 +31,9 @@ Example Usage
 
 * Set up environment
 ```
-$ git clone https://github.com/x89/reddit-resub
-$ cd reddit-resub
-$ virtualenv . -p python3
-$ source bin/activate
-$ pip install -r requirements.txt
+ git clone https://github.com/x89/reddit-resub
+ cd reddit-resub
+ virtualenv . -p python3
+ source bin/activate
+ pip install -r requirements.txt
 ```
