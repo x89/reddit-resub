@@ -30,7 +30,10 @@ Example Usage
     `python reddit.py --import --user x78 --file abc.subs`    
 
 * Set up environment
-
-    `virtualenv .`    
-    `source bin/activate`    
-    `pip install -r requirements.txt`    
+```
+$ git clone https://github.com/x89/reddit-resub
+$ cd reddit-resub
+$ virtualenv . -p python3
+$ source bin/activate
+$ pip install -r requirements.txt
+```
