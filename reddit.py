@@ -117,7 +117,7 @@ class Resub:
     def get_user(self):
         '''
         Specifically returns the username from the Reddit object, not the one
-        specified by the user / script. This is guaranteed to be correct in 
+        specified by the user / script. This is guaranteed to be correct in
         other words.
         '''
         return str(self._r.user)
