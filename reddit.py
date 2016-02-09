@@ -3,7 +3,6 @@
 import praw
 import argparse
 import json
-from time import sleep
 
 parser = argparse.ArgumentParser(description='Resubscribe to your old subreddits.')
 parser.add_argument('--import', '-i', action="store_true", help="Specify -i to import to the user\
@@ -13,7 +12,6 @@ parser.add_argument('--file', '-f', help="Provide a filename to use.")
 
 class Resub:
     _r = praw.Reddit('reddit-resub')
-    _reddit_sleep = 2 #  Seconds to sleep for, Reddit requests you don't do more than 2 per second.
     _default_subreddits = (
         'announcements',
         'art',
@@ -90,10 +88,9 @@ class Resub:
         for sub in self._default_subreddits:
             try:
                 self._r.unsubscribe(sub)
+                print("Unsubscribed from default subreddit {sub}".format(sub=sub))
             except praw.errors.NotFound:
                 print("Not subscribed to %s, skipping" % sub)
-            print("Unsubscribed from default subreddit {sub}".format(sub=sub))
-            sleep(self._reddit_sleep)
 
     def import_subs(self):
         '''
@@ -110,15 +107,13 @@ class Resub:
         for sub in my_subs:
             self._r.unsubscribe(sub)
             print("Unsubscribed from subreddit {sub}".format(sub=sub))
-            sleep(self._reddit_sleep)
         for sub in new_subs:
             if sub not in my_subs:
                 try:
                     self._r.subscribe(sub)
+                    print("Subscribed to {sub}".format(sub=sub))
                 except praw.errors.Forbidden:
                     print("Subreddit %s is private, skipping." % sub)
-                print("Subscribed to {sub}".format(sub=sub))
-                sleep(self._reddit_sleep)
 
     def get_user(self):
         '''
