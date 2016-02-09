@@ -88,7 +88,10 @@ class Resub:
         '''
         print("Unsubscribing from all default subreddits")
         for sub in self._default_subreddits:
-            self._r.unsubscribe(sub)
+            try:
+                self._r.unsubscribe(sub)
+            except praw.errors.NotFound:
+                print("Not subscribed to %s, skipping" % sub)
             print("Unsubscribed from default subreddit {sub}".format(sub=sub))
             sleep(self._reddit_sleep)
 
