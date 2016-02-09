@@ -113,7 +113,10 @@ class Resub:
             sleep(self._reddit_sleep)
         for sub in new_subs:
             if sub not in my_subs:
-                self._r.subscribe(sub)
+                try:
+                    self._r.subscribe(sub)
+                except praw.errors.Forbidden:
+                    print("Subreddit %s is private, skipping." % sub)
                 print("Subscribed to {sub}".format(sub=sub))
                 sleep(self._reddit_sleep)
 
