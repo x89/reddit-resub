@@ -11,7 +11,7 @@ parser.add_argument('--user', '-u', help="Reddit username.")
 parser.add_argument('--file', '-f', help="Provide a filename to use.")
 
 class Resub:
-    _r = praw.Reddit('reddit-resub')
+    _r = praw.Reddit('reddit-resub 2016-02-20')
     _default_subreddits = (
         'announcements', 'art', 'askreddit', 'askscience', 'aww', 'blog',
         'books', 'creepy', 'dataisbeautiful', 'diy', 'documentaries',
@@ -43,6 +43,8 @@ class Resub:
     def unsub_defaults(self):
         '''
         Unsubscribes from all default subreddits.
+        Basically depricated because we'll unsubscribe from
+        everything 
         '''
         print("Unsubscribing from all default subreddits")
         for sub in self._default_subreddits:
