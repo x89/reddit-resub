@@ -40,6 +40,13 @@ class Resub:
             print("Exporting {user}'s subreddits to {file}".format(file=filename, user=self.get_user()))
             self.export_subs()
 
+    def unsub_all(self):
+        '''
+        Unsubscribes from every subreddit.
+        '''
+        for subreddit in self._r.get_my_subreddits():
+            self._r.unsubscribe(subreddit)
+
     def unsub_defaults(self):
         '''
         Unsubscribes from all default subreddits.
