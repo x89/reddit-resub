@@ -3,3 +3,4 @@ include/
 lib/
 *.subs
 praw.ini
+pip-selfcheck.json
