@@ -35,17 +35,37 @@ class Resub:
 
         if subscribe:
             print("Subscribing to subreddits in '{file}'".format(file=filename, user=self.get_user()))
-            self.import_subs()
+            self.sub_clever()
         else:
             print("Exporting {user}'s subreddits to {file}".format(file=filename, user=self.get_user()))
             self.export_subs()
+
+    def unsub(self, subreddit):
+        '''
+        Unsubscribes and prints to STDOUT
+        '''
+        try:
+            self._r.unsubscribe(subreddit)
+            print("Unsubscribed from subreddit {sub}".format(sub=subreddit))
+        except praw.errors.NotFound:
+            print("Not subscribed to %s, skipping" % sub)
+
+    def sub(self, subreddit):
+        '''
+        Try to subscribe to a given subreddit.
+        '''
+        try:
+            self._r.subscribe(subreddit)
+            print("Subscribed to {sub}".format(sub=subreddit))
+        except praw.errors.Forbidden:
+            print("Subreddit %s is private, skipping." % subreddit)
 
     def unsub_all(self):
         '''
         Unsubscribes from every subreddit.
         '''
-        for subreddit in self._r.get_my_subreddits():
-            self._r.unsubscribe(subreddit)
+        for subreddit in self.get_subs():
+            self.unsub(subreddit)
 
     def unsub_defaults(self):
         '''
@@ -55,34 +75,30 @@ class Resub:
         '''
         print("Unsubscribing from all default subreddits")
         for sub in self._default_subreddits:
-            try:
-                self._r.unsubscribe(sub)
-                print("Unsubscribed from default subreddit {sub}".format(sub=sub))
-            except praw.errors.NotFound:
-                print("Not subscribed to %s, skipping" % sub)
+            self.unsub(sub)
 
-    def import_subs(self):
+    def get_wanted_subs(self):
         '''
-        Uses subreddits defined in JSON format in a file to import to a Reddit
-        user account. Unsubscribes from default subreddits first.
+        Opens the list of subreddits we want to subscribe to
+        from a json fille.
         '''
         fh = open(self._filename, 'r')
-        new_subs = json.load(fh)
+        subs = json.load(fh)
         fh.close()
-        self.unsub_defaults()
-        my_subs = list(
-            set(self.get_subs()) - (set(self._default_subreddits) | set(new_subs))
-        )
-        for sub in my_subs:
-            self._r.unsubscribe(sub)
-            print("Unsubscribed from subreddit {sub}".format(sub=sub))
-        for sub in new_subs:
-            if sub not in my_subs:
-                try:
-                    self._r.subscribe(sub)
-                    print("Subscribed to {sub}".format(sub=sub))
-                except praw.errors.Forbidden:
-                    print("Subreddit %s is private, skipping." % sub)
+        return list(set(subs))
+
+    def sub_clever(self):
+        '''
+        Tries to be clever.
+        '''
+        wanted_subs = self.get_wanted_subs()
+        current_subs = self.get_subs()
+        magic = set(wanted_subs) - set(current_subs)
+        for sub in magic:
+            if sub in wanted_subs:
+                self.sub(sub)
+            elif sub not in wanted_subs:
+                self.unsub(sub)
 
     def get_user(self):
         '''
