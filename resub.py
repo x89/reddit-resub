@@ -113,7 +113,8 @@ class Resub:
         Saves the user's subreddits to file.
         '''
         fh = open(self._filename, 'w')
-        json.dump(sorted(self.get_subs()), fh, indent=2)
+        subs = sorted(self.get_subs(), key=str.lower)
+        json.dump(subs, fh, indent=2)
         fh.close()
 
     def get_subs(self):
