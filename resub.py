@@ -11,18 +11,18 @@ parser.add_argument('--user', '-u', help="Reddit username.")
 parser.add_argument('--file', '-f', help="Provide a filename to use.")
 
 class Resub:
-    _r = praw.Reddit('reddit-resub 2016-02-20')
+    _r = praw.Reddit('reddit-resub 2017-05-08')
     _default_subreddits = (
-        'announcements', 'art', 'askreddit', 'askscience', 'aww', 'blog',
-        'books', 'creepy', 'dataisbeautiful', 'diy', 'documentaries',
-        'earthporn', 'explainlikeimfive', 'fitness', 'food', 'funny',
-        'futurology', 'gadgets', 'gaming', 'getmotivated', 'gifs', 'history',
-        'iama', 'internetIsBeautiful', 'jokes', 'lifeprotips', 'listentothis',
-        'mildlyinteresting', 'movies', 'music', 'news', 'nosleep',
-        'nottheonion', 'oldschoolcool', 'personalfinance', 'philosophy',
-        'photoshopbattles', 'pics', 'science', 'showerthoughts', 'space',
-        'sports', 'television', 'tifu', 'todayilearned', 'twoXChromosomes',
-        'upliftingnews', 'videos', 'worldnews', 'writingprompts',
+        'announcements',  'Art',  'AskReddit',  'askscience',  'aww',  'blog',
+        'books',  'creepy',  'dataisbeautiful',  'DIY',  'Documentaries',
+        'EarthPorn',  'explainlikeimfive',  'food',  'funny',  'Futurology',
+        'gadgets',  'gaming',  'GetMotivated',  'gifs',  'history',  'IAmA',
+        'InternetIsBeautiful',  'Jokes',  'LifeProTips',  'listentothis',
+        'mildlyinteresting',  'movies',  'Music',  'news',  'nosleep',
+        'nottheonion',  'OldSchoolCool',  'personalfinance',  'philosophy',
+        'photoshopbattles',  'pics',  'science',  'Showerthoughts',  'space',
+        'sports',  'television',  'tifu',  'todayilearned',  'UpliftingNews',
+        'videos',  'worldnews',
     )
 
     def __init__(self, subscribe, user=None, filename=None):
@@ -71,7 +71,7 @@ class Resub:
         '''
         Unsubscribes from all default subreddits.
         Basically depricated because we'll unsubscribe from
-        everything 
+        everything
         '''
         print("Unsubscribing from all default subreddits")
         for sub in self._default_subreddits:
