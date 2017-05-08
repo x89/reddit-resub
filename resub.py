@@ -4,26 +4,15 @@ import praw
 import argparse
 import json
 
-parser = argparse.ArgumentParser(description='Resubscribe to your old subreddits.')
-parser.add_argument('--import', '-i', action="store_true", help="Specify -i to import to the user\
-        Default is to save from a user (safe).")
+parser = argparse.ArgumentParser(
+    description='Resubscribe to your old subreddits.')
+parser.add_argument('--import', '-i', action="store_true",
+    help="Specify -i to import to the user, the default is to save from a user.")
 parser.add_argument('--user', '-u', help="Reddit username.")
 parser.add_argument('--file', '-f', help="Provide a filename to use.")
 
 class Resub:
     _r = praw.Reddit('reddit-resub 2017-05-08')
-    _default_subreddits = (
-        'announcements',  'Art',  'AskReddit',  'askscience',  'aww',  'blog',
-        'books',  'creepy',  'dataisbeautiful',  'DIY',  'Documentaries',
-        'EarthPorn',  'explainlikeimfive',  'food',  'funny',  'Futurology',
-        'gadgets',  'gaming',  'GetMotivated',  'gifs',  'history',  'IAmA',
-        'InternetIsBeautiful',  'Jokes',  'LifeProTips',  'listentothis',
-        'mildlyinteresting',  'movies',  'Music',  'news',  'nosleep',
-        'nottheonion',  'OldSchoolCool',  'personalfinance',  'philosophy',
-        'photoshopbattles',  'pics',  'science',  'Showerthoughts',  'space',
-        'sports',  'television',  'tifu',  'todayilearned',  'UpliftingNews',
-        'videos',  'worldnews',
-    )
 
     def __init__(self, subscribe, user=None, filename=None):
         self._r.login(user)
@@ -34,10 +23,12 @@ class Resub:
         self._filename = filename
 
         if subscribe:
-            print("Subscribing to subreddits in '{file}'".format(file=filename, user=self.get_user()))
+            print("Subscribing to subreddits in '{file}'".format(
+                file=filename, user=self.get_user()))
             self.sub_clever()
         else:
-            print("Exporting {user}'s subreddits to {file}".format(file=filename, user=self.get_user()))
+            print("Exporting {user}'s subreddits to {file}".format(
+                file=filename, user=self.get_user()))
             self.export_subs()
 
     def unsub(self, subreddit):
@@ -60,23 +51,6 @@ class Resub:
         except praw.errors.Forbidden:
             print("Subreddit %s is private, skipping." % subreddit)
 
-    def unsub_all(self):
-        '''
-        Unsubscribes from every subreddit.
-        '''
-        for subreddit in self.get_subs():
-            self.unsub(subreddit)
-
-    def unsub_defaults(self):
-        '''
-        Unsubscribes from all default subreddits.
-        Basically depricated because we'll unsubscribe from
-        everything
-        '''
-        print("Unsubscribing from all default subreddits")
-        for sub in self._default_subreddits:
-            self.unsub(sub)
-
     def get_wanted_subs(self):
         '''
         Opens the list of subreddits we want to subscribe to
@@ -89,16 +63,18 @@ class Resub:
 
     def sub_clever(self):
         '''
-        Tries to be clever.
+        Use the minimal number of API calls to subscribe / unsubscribe.
         '''
-        wanted_subs = self.get_wanted_subs()
-        current_subs = self.get_subs()
-        magic = set(wanted_subs) - set(current_subs)
+        wanted_subs = set(self.get_wanted_subs())
+        current_subs = set(self.get_subs())
+        magic = wanted_subs - current_subs
         for sub in magic:
             if sub in wanted_subs:
+                # Subscribe to wanted subs we're not already subbed to
                 self.sub(sub)
-            elif sub not in wanted_subs:
-                self.unsub(sub)
+        for sub in current_subs - wanted_subs:
+            # Unsub from everything remaining
+            self.unsub(sub)
 
     def get_user(self):
         '''
