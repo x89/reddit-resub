@@ -134,4 +134,7 @@ if __name__ == "__main__":
     # If true then subscribe, if false then export to file.
     subscribe = getattr(args, 'import')
 
-    r = Resub(subscribe, filename=getattr(args, 'file'), user=getattr(args, 'user'))
+    r = Resub(subscribe,
+        filename=getattr(args, 'file'),
+        user=getattr(args, 'user')
+    )
