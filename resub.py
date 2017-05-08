@@ -69,8 +69,7 @@ class Resub:
         '''
         wanted_subs = set(self.get_wanted_subs())
         current_subs = set(self.get_subs())
-        magic = wanted_subs - current_subs
-        for sub in magic:
+        for sub in wanted_subs - current_subs:
             if sub in wanted_subs:
                 # Subscribe to wanted subs we're not already subbed to
                 self.sub(sub)
