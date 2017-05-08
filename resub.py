@@ -7,9 +7,11 @@ import json
 parser = argparse.ArgumentParser(
     description='Resubscribe to your old subreddits.')
 parser.add_argument('--import', '-i', action="store_true",
-    help="Specify -i to import to the user, the default is to save from a user.")
+                    help="Specify -i to import to the user, the default is to \
+                    save from a user.")
 parser.add_argument('--user', '-u', help="Reddit username.")
 parser.add_argument('--file', '-f', help="Provide a filename to use.")
+
 
 class Resub:
     _r = praw.Reddit('reddit-resub 2017-05-08')
@@ -111,6 +113,6 @@ if __name__ == "__main__":
     subscribe = getattr(args, 'import')
 
     r = Resub(subscribe,
-        filename=getattr(args, 'file'),
-        user=getattr(args, 'user')
-    )
+              filename=getattr(args, 'file'),
+              user=getattr(args, 'user')
+              )
