@@ -36,21 +36,15 @@ class Resub:
         '''
         Unsubscribes and prints to STDOUT
         '''
-        try:
-            self._r.unsubscribe(subreddit)
-            print("Unsubscribed from subreddit {sub}".format(sub=subreddit))
-        except praw.errors.NotFound:
-            print("Not subscribed to %s, skipping" % sub)
+        self._r.subreddit(subreddit).unsubscribe()
+        print("Unsubscribed from subreddit {sub}".format(sub=subreddit))
 
     def sub(self, subreddit):
         '''
         Try to subscribe to a given subreddit.
         '''
-        try:
-            self._r.subscribe(subreddit)
-            print("Subscribed to {sub}".format(sub=subreddit))
-        except praw.errors.Forbidden:
-            print("Subreddit %s is private, skipping." % subreddit)
+        self._r.subreddit(subreddit).subscribe()
+        print("Subscribed to {sub}".format(sub=subreddit))
 
     def get_wanted_subs(self):
         '''
