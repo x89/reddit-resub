@@ -14,10 +14,9 @@ parser.add_argument('--file', '-f', help="Provide a filename to use.")
 
 
 class Resub:
-    _r = praw.Reddit('reddit-resub 2017-05-08')
+    _r = praw.Reddit(user_agent='reddit-resub 2017-05-08')
 
     def __init__(self, subscribe, user=None, filename=None):
-        self._r.login(user)
         self._user = self.get_user()
 
         if not filename:
@@ -83,7 +82,7 @@ class Resub:
         specified by the user / script. This is guaranteed to be correct in
         other words.
         '''
-        return str(self._r.user)
+        return str(self._r.user.me())
 
     def export_subs(self):
         '''
@@ -99,7 +98,7 @@ class Resub:
         Returns a unique list of subreddits to which the user is subscribed.
         '''
         my_subs = set()
-        for sub in self._r.get_my_subreddits(limit=None):
+        for sub in self._r.user.subreddits(limit=None):
             my_subs.add(str(sub))
         return list(my_subs)
 
