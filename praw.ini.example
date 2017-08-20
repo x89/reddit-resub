@@ -1,6 +1,6 @@
 [DEFAULT]
-user = 
-pswd = 
+username = 
+password = 
 client_id =
 client_secret =
 log_requests = 0
